@@ -14,14 +14,12 @@ const Game = props => {
     title: "",
     uuid: "",
     error_msg: "",
-    x_coordinates: 0,
-    y_coordinates: 0
+    coordinates: "(0, 0)",
+    exits: [],
+    cooldown: ""
   });
 
-  const [playerLocation, setPlayerLocation] = useState({
-    x: 0,
-    y: 0
-  });
+  const [playerLocation, setPlayerLocation] = useState();
 
   const [roomOtherPlayers, setRoomOtherPlayers] = useState([]);
 
@@ -56,19 +54,15 @@ const Game = props => {
 
   //initial data
   useEffect(() => {
-    const token = localStorage.getItem("token");
     axios
-      .get("https://adventure-text.herokuapp.com/api/adv/init/", {
+      .get("https://lambda-treasure-hunt.herokuapp.com/api/adv/init", {
         headers: {
-          authorization: `Token ${token}`
+          authorization: `Token 0bb7d0b67867e145c61f4ef26abd582b65d9a42e`
         }
       })
       .then(res => {
         setCurrentPlayer({ ...res.data, error_msg: "" });
-        setPlayerLocation({
-          x: currentPlayer.x_coordinates,
-          y: currentPlayer.y_coordinates
-        });
+        setPlayerLocation(currentPlayer.coordinates);
         console.log(res.data);
       })
       .catch(err => console.log(err));
@@ -76,20 +70,20 @@ const Game = props => {
 
   //moving directions
   useEffect(() => {
-    const token = localStorage.getItem("token");
     axios
       .post(
-        "https://adventure-text.herokuapp.com/api/adv/move/",
+        "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/",
         { direction: direction },
-        { headers: { authorization: `Token ${token}` } }
+        {
+          headers: {
+            authorization: `Token 0bb7d0b67867e145c61f4ef26abd582b65d9a42e`
+          }
+        }
       )
       .then(res => {
         setRoomOtherPlayers(res.data.other_players);
         setCurrentPlayer(res.data);
-        setPlayerLocation({
-          x: currentPlayer.x_coordinates,
-          y: currentPlayer.y_coordinates
-        });
+        setPlayerLocation(currentPlayer.coordinates);
       })
       .catch(err => console.log(err));
     return () => setDirection("");
@@ -107,7 +101,7 @@ const Game = props => {
   return (
     <div className={classes.container}>
       <div className={classes.sideBar}>
-        <h1 className={classes.header}>MUD Adventure</h1>
+        <h1 className={classes.header}>Lambda Treasure Hunt</h1>
         <h2 className={classes.instructions}>Use arrow keys to move.</h2>
         <div className={classes.headerAndText}>
           <h2 className={classes.headertwo}>Name: </h2>
@@ -116,6 +110,18 @@ const Game = props => {
         <div className={classes.headerAndText}>
           <h2 className={classes.headertwo}>Current Room:</h2>
           <p className={classes.text}> {currentPlayer.description}</p>
+        </div>
+        <div className={classes.headerAndText}>
+          <h2 className={classes.headertwo}>Possible Exits:</h2>
+          <p className={classes.text}> {currentPlayer.exits}</p>
+        </div>
+        <div className={classes.headerAndText}>
+          <h2 className={classes.headertwo}>Coordinates</h2>
+          <p className={classes.text}> {currentPlayer.coordinates}</p>
+        </div>
+        <div className={classes.headerAndText}>
+          <h2 className={classes.headertwo}>Cooldown</h2>
+          <p className={classes.text}> {currentPlayer.cooldown}</p>
         </div>
         <div className={classes.errorContainer}>
           <div

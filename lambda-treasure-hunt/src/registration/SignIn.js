@@ -13,6 +13,11 @@ const SignIn = props => {
         headers: "Token 0bb7d0b67867e145c61f4ef26abd582b65d9a42e"
       })
       .then(res => {
+        localStorage.setItem(
+          "token",
+          "0bb7d0b67867e145c61f4ef26abd582b65d9a42e"
+        );
+
         console.log(res);
       })
       .then(() => {
